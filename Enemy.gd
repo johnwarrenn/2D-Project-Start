@@ -9,6 +9,10 @@ func _physics_process(delta):
 	self.rotation = direction.angle() + PI / 2
 	
 func _on_area_entered(area):
-	self.queue_free()
-	
-	Gamestate.increase_score(10)
+	if area.is_in_group("asteroid"):
+		self.queue_free()
+	elif area.is_in_group("enemy"): 
+		pass
+	else:
+		self.queue_free()
+		Gamestate.increase_score(10)
