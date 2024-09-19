@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bkbm56q1yaj7d"]
+[gd_scene load_steps=4 format=3 uid="uid://w6fqo67pgjkk"]
 
 [ext_resource type="Script" path="res://Laser.gd" id="1_fwjxu"]
 [ext_resource type="Texture2D" uid="uid://d3sphkpverii3" path="res://kenney_space-shooter-redux/PNG/Lasers/laserRed04.png" id="2_586wc"]

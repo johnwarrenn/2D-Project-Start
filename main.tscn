@@ -1,14 +1,22 @@
-[gd_scene load_steps=13 format=3 uid="uid://dduwwcx4kmr54"]
+[gd_scene load_steps=18 format=3 uid="uid://dduwwcx4kmr54"]
 
 [ext_resource type="Texture2D" uid="uid://trt24sg07e6g" path="res://back.png" id="1_lsohi"]
 [ext_resource type="Script" path="res://Player.gd" id="2_04yug"]
-[ext_resource type="PackedScene" path="res://laser.tscn" id="3_qoqxm"]
+[ext_resource type="Texture2D" uid="uid://b4ti0pmx27n2y" path="res://kenney_space-shooter-redux/PNG/Meteors/meteorGrey_small1.png" id="2_47x0k"]
+[ext_resource type="Script" path="res://Asteroid.gd" id="2_d63mn"]
+[ext_resource type="PackedScene" uid="uid://w6fqo67pgjkk" path="res://laser.tscn" id="3_qoqxm"]
 [ext_resource type="Texture2D" uid="uid://dv7ee1dpglc8s" path="res://kenney_space-shooter-redux/PNG/Enemies/enemyBlue5.png" id="4_wjx1n"]
 [ext_resource type="Script" path="res://EnemySpawner.gd" id="5_voc1g"]
 [ext_resource type="PackedScene" uid="uid://b73hndic7pt3r" path="res://enemy.tscn" id="6_n6pt0"]
 [ext_resource type="FontFile" uid="uid://b04ylcax4a37x" path="res://PixelOperator8-Bold.ttf" id="7_yjc24"]
 [ext_resource type="Script" path="res://ScoreLabel.gd" id="8_2fn7f"]
 [ext_resource type="Script" path="res://GameOverLabel.gd" id="9_wbr76"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gje0o"]
+radius = 33.3333
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pclfh"]
+bg_color = Color(0.341176, 0.698039, 0.27451, 0.682353)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qdd6i"]
 radius = 18.0
@@ -21,6 +29,12 @@ font_size = 30
 font = ExtResource("7_yjc24")
 font_size = 52
 
+[sub_resource type="Curve2D" id="Curve2D_g3fab"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -97.3333, -69.3333, 0, 0, 0, 0, -97.3333, 1324, 0, 0, 0, 0, 816, 1334.67, 0, 0, 0, 0, 816, -84, 0, 0, 0, 0, -97.3333, -69.3333)
+}
+point_count = 5
+
 [node name="Main" type="Node2D"]
 position = Vector2(0, -5.96046e-08)
 scale = Vector2(0.75, 0.75)
@@ -30,8 +44,31 @@ position = Vector2(360, 640)
 scale = Vector2(0.351563, 0.833333)
 texture = ExtResource("1_lsohi")
 
+[node name="Asteroid" type="Area2D" parent="." groups=["asteroid"]]
+position = Vector2(360, 640)
+script = ExtResource("2_d63mn")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Asteroid"]
+shape = SubResource("CircleShape2D_gje0o")
+
+[node name="Sprite2D" type="Sprite2D" parent="Asteroid"]
+scale = Vector2(3.10714, 2.94048)
+texture = ExtResource("2_47x0k")
+
+[node name="ProgressBar" type="ProgressBar" parent="Asteroid"]
+offset_left = -28.0
+offset_top = -14.6667
+offset_right = 28.0
+offset_bottom = 12.3333
+theme_override_styles/fill = SubResource("StyleBoxFlat_pclfh")
+max_value = 3.0
+value = 3.0
+show_percentage = false
+
 [node name="Player2" type="Area2D" parent="."]
-position = Vector2(365.333, 1081.33)
+unique_name_in_owner = true
+position = Vector2(361.333, 764)
+rotation = 1.56867
 script = ExtResource("2_04yug")
 laser_tscn = ExtResource("3_qoqxm")
 metadata/_edit_group_ = true
@@ -44,13 +81,6 @@ flip_v = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player2"]
 shape = SubResource("CircleShape2D_qdd6i")
 
-[node name="EnemySpawner" type="Node2D" parent="."]
-script = ExtResource("5_voc1g")
-enemy_tscn = ExtResource("6_n6pt0")
-
-[node name="Timer" type="Timer" parent="EnemySpawner"]
-autostart = true
-
 [node name="ScoreLabel" type="Label" parent="."]
 offset_left = 13.3333
 offset_top = 10.6667
@@ -62,13 +92,30 @@ script = ExtResource("8_2fn7f")
 
 [node name="GameOverLabel" type="Label" parent="."]
 visible = false
-offset_left = 48.0
-offset_top = 335.0
-offset_right = 497.0
-offset_bottom = 388.0
+offset_left = 153.333
+offset_top = 384.0
+offset_right = 602.333
+offset_bottom = 437.0
 text = "GAME OVER"
 label_settings = SubResource("LabelSettings_mdu65")
 script = ExtResource("9_wbr76")
 
+[node name="EnemySpawner" type="Node2D" parent="."]
+position = Vector2(0, 7.94728e-08)
+script = ExtResource("5_voc1g")
+enemy_tscn = ExtResource("6_n6pt0")
+
+[node name="Path2D" type="Path2D" parent="EnemySpawner"]
+curve = SubResource("Curve2D_g3fab")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="EnemySpawner/Path2D"]
+unique_name_in_owner = true
+position = Vector2(-97.3333, -69.3333)
+rotation = 1.5708
+
+[node name="Timer" type="Timer" parent="EnemySpawner"]
+autostart = true
+
+[connection signal="area_entered" from="Asteroid" to="Asteroid" method="_on_area_entered"]
 [connection signal="area_entered" from="Player2" to="Player2" method="_on_area_entered"]
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="spawn_enemy_ship"]
